@@ -1,47 +1,53 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template,redirect
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLACHEMY_DATABASE_URI']='sqlite:///oshi.db'
+app.config['SQLALCHEMY_DATABASE_URI']='sqlite:////Users/ikenoshuri/システム主専攻実習_推し/example.db'
 db=SQLAlchemy(app)
 
 class Evaluate(db.Model):
     # ここに評価項目を挿入する
     id=db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    rating = db.Column(db.Float, nullable=False)
+    age = db.Column(db.Integer, nullable=False)
     
     def __repr__(self):
-        return '<Item {}>'.format(self.name)
+        return '<Evaluate {}>'.format(self.name)
     
 
 @app.route('/')
 def welcome_webpage():
     return render_template('webpage.html')
 
+@app.route('/survey.html')
+def welcome_survey():
+    return render_template('survey.html')
 
-# @app.route('/submit', methods=['GET'])
-# def submit_survey():
-#     # フォームデータの受け取り
-#     q1 = request.form.get('q1')
-#     q2 = request.form.get('q2')
-#     q3 = request.form.get('q3')
+@app.route('/webpage.html')
+def again_webpage():
+    return render_template('webpage.html')
 
-#     # データベースへの保存や処理など、必要な処理を実行する
+@app.route('/survey.html',methods= ["POST"])
+def survey_process():
+    user_rating = int(request.form.get('data-rating'))  # ユーザーからの評価を取得します
+    if user_rating is not None:
+        return redirect('/result.html?user_rating={}'.format(user_rating))
+    else:
+        return redirect('/survey.html')
 
-#     # レスポンスの生成
-#     response = {'message': 'アンケートが送信されました'}
-#     return jsonify(response)
-
-
-@app.route('/items', methods=['POST'])
+@app.route('/result.html',methods=["GET","POST"])
 def get_items():
-    user_rating = float(request.form['rating'])  # ユーザーからの評価を取得します
-    items = Item.query.filter(Item.rating >= user_rating).all()  # 評価がユーザーの評価以上の項目のみを取得します
-    result = []
-    for item in items:
-        result.append({'name': item.name, 'rating': item.rating})
-    return {'items': result}
-
+    user_rating = request.args.get('user_rating')
+    if user_rating is not None:
+        user_rating = int(user_rating)
+        items = Evaluate.query.filter(Evaluate.age >= user_rating).all()
+        results = []
+        for item in items:
+            results.append({'name': item.name, 'age': item.age})
+        return render_template('result.html', results=results)
+    else:
+        return redirect('/survey.html')
 if __name__ == '__main__':
+    # db.create_all()
     app.run()
+

@@ -1,79 +1,80 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Evaluation Survey</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-        }
-
-        main {
-            margin: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        input[type="radio"] {
-            margin-right: 5px;
-        }
-
-        button {
-            padding: 10px 20px;
+    <head>
+        <title>アンケート</title>
+        <style>
+          .rating-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+          }
+      
+          .rating-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            border: none;
+            margin: 0 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+          }
+      
+          .rating-button:hover {
+            background-color: #ccc;
+            transform: scale(1.1);
+          }
+      
+          .rating-button.active {
             background-color: #333;
             color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <main>
-        <h1>Evaluation Survey</h1>
-
-        <form>
-            <label>
-                Question 1: How would you rate the overall experience?
-                <br>
-                <input type="radio" name="q1" value="1">1
-                <input type="radio" name="q1" value="2">2
-                <input type="radio" name="q1" value="3">3
-                <input type="radio" name="q1" value="4">4
-                <input type="radio" name="q1" value="5">5
-                <input type="radio" name="q1" value="6">6
-                <input type="radio" name="q1" value="7">7
-            </label>
-
-            <label>
-                Question 2: How would you rate the customer service?
-                <br>
-                <input type="radio" name="q2" value="1">1
-                <input type="radio" name="q2" value="2">2
-                <input type="radio" name="q2" value="3">3
-                <input type="radio" name="q2" value="4">4
-                <input type="radio" name="q2" value="5">5
-                <input type="radio" name="q2" value="6">6
-                <input type="radio" name="q2" value="7">7
-            </label>
-
-            <label>
-                Question 3: How would you rate the product quality?
-                <br>
-                <input type="radio" name="q3" value="1">1
-                <input type="radio" name="q3" value="2">2
-                <input type="radio" name="q3" value="3">3
-                <input type="radio" name="q3" value="4">4
-                <input type="radio" name="q3" value="5">5
-                <input type="radio" name="q3" value="6">6
-                <input type="radio" name="q3" value="7">7
-            </label>
-
-            <button type="submit">Submit</button>
+          }
+        </style>
+      </head>
+      <body>
+        <h1>アンケート</h1>
+        <label for="rate">評価：</label>
+        <form action="/survey.html" method="POST">
+          <input type="text" name="data-rating">
+          <button type="submit">送信</button>
+          <!-- <div class="rating-container">
+            <button class="rating-button" data-rating="1">1</button>
+            <button class="rating-button" data-rating="2">2</button>
+            <button class="rating-button" data-rating="3">3</button>
+            <button class="rating-button" data-rating="4">4</button>
+            <button class="rating-button" data-rating="5">5</button>
+            <button class="rating-button" data-rating="6">6</button>
+            <button class="rating-button" data-rating="7">7</button>
+            <button class="rating-button" data-rating="8">8</button>
+            <button class="rating-button" data-rating="9">9</button>
+            <button class="rating-button" data-rating="10">10</button>
+          </div> -->
+            <!-- <button>診断結果を表示</button> -->
         </form>
-    </main>
-</body>
+        <!-- <script>
+          const buttons = document.querySelectorAll('.rating-button');
+          let selectedRating = null;
+      
+          function handleButtonClick() {
+            if (selectedRating === this.dataset.rating) {
+              selectedRating = null;
+              this.classList.remove('active');
+            } else {
+              selectedRating = this.dataset.rating;
+              buttons.forEach(button => {
+                if (button !== this) {
+                  button.classList.remove('active');
+                }
+              });
+              this.classList.add('active');
+            }
+          }
+      
+          buttons.forEach(button => {
+            button.addEventListener('click', handleButtonClick);
+          });
+        </script> -->
+      </body>
 </html>
