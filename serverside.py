@@ -1,16 +1,46 @@
-from flask import Flask, request, jsonify, render_template,redirect
+from flask import Flask, request, render_template, redirect, send_file
+import threading
 from flask_sqlalchemy import SQLAlchemy
 import sqlite3
 
 #flaskを使うためのおまじないです
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI']='sqlite:////Users/ikenoshuri/システム主専攻実習_推し/example.db'
-db=SQLAlchemy(app)
+# app.config['SQLALCHEMY_DATABASE_URI']='sqlite:////Users/ikenoshuri/システム主専攻実習_推し/example.db'
+# db=SQLAlchemy(app)
 
-#SQLite３を使うためのおまじないです
-conn = sqlite3.connect('example.db')
-cursor = conn.cursor()
 
+# スレッドローカルストレージを使用してSQLite接続を保存する
+thread_local = threading.local()
+
+def get_db():
+    # スレッドローカルストレージから接続を取得する
+    if not hasattr(thread_local, 'connection'):
+        thread_local.connection = sqlite3.connect('example.db')
+    return thread_local.connection
+
+def get_cursor():
+    # スレッドローカルストレージからカーソルを取得する
+    db = get_db()
+    if not hasattr(thread_local, 'cursor'):
+        thread_local.cursor = db.cursor()
+    return thread_local.cursor
+
+def get_image_data(image_id):
+    conn = sqlite3.connect('example.db')
+    c = conn.cursor()
+    search_image='image/'+image_id
+    c.execute('SELECT image FROM pre_sns WHERE image = ?', (search_image,))
+    result = c.fetchall()
+    image_data=''
+    if result:
+        image = result[0]
+        for i in image:
+            image_data+=i
+        conn.close()
+        return image_data
+    else:
+        conn.close()
+        return None
 #ここはデータベースのクラスを設定しています
 #ですが設定により使わないかもしれません
 #使う場合がありますので残しておいてください
@@ -32,34 +62,28 @@ cursor = conn.cursor()
 #     id = db.Column(db.Integer,primary_key=True)
 #     name = db.Column(db.String(80), nullable=False)
 #     twitter = db.Column(db.String(80), nullable=False)
-#     instagram = db.Column(db.String(80), nullable=False)
 #     youtube = db.Column(db.String(80), nullable=False)
 
 
 
-    def __repr__(self):
-        return '<Sns {}>'.format(self.name)
+    # def __repr__(self):
+    #     return '<Sns {}>'.format(self.name)
     
 #ここはルートでHTMLを表示するだけです
 @app.route('/')
-def welcome_webpage():
+def welcome():
     return render_template('webpage.html')
 
-@app.route('/survey.html')
-def welcome_survey():
-    return render_template('survey.html')
+@app.route('/survey')
+def survey():
+    return render_template('survey1.html')
 
-@app.route('/webpage.html')
-def again_webpage():
+@app.route('/webpage')
+def webpage():
     return render_template('webpage.html')
 
-@app.route('/survey.html',methods= ["POST"])
-def survey_process():
-    # user_rate = [int(rate) for rate in request.form.getlist('rate')]
-    
-    # ここで値をHTMLから受け取りたいです
-    # 引数はHTMLサイドと同じ名前にしないといけないので揃えてください（どちらに揃えても大丈夫です）
-    
+@app.route('/result',methods=["GET","POST"])
+def result():
     member = request.form.get('member')
     age = request.form.get('age')
     sing = request.form.get('sing')
@@ -68,70 +92,103 @@ def survey_process():
     music_2 = request.form.get('music_2')
     conditions = []
     params = []
-
+   
     #ここでは受け取った値の値によってデータベースの条件式が変化します
     #多いなら>=を選択する、少ないなら<にする
     if member == '多い':
         conditions.append("member >= ?")
     elif member == '少ない':
         conditions.append("member < ?")
+    member=10
     params.append(member)
 
     if age == '多い':
-        conditions.append("age >= ?")
+        conditions.append("age >=?")
     elif age == '少ない':
         conditions.append("age < ?")
+    age=19
     params.append(age)
 
     if sing == '多い':
-        conditions.append("sing >= ?")
+        conditions.append("sing >=?")
     elif sing == '少ない':
-        conditions.append("sing < ?")
+        conditions.append("sing <?")
+    sing=6
     params.append(sing)
 
     if fan == '多い':
         conditions.append("fan >= ?")
     elif fan == '少ない':
         conditions.append("fan < ?")
+    fan=6
     params.append(fan)
 
-    if music_1 == '多い':
-        conditions.append("music_1 >= ?")
-    elif music_1 == '少ない':
-        conditions.append("music_1 < ?")
+    if music_1 == '1':
+        conditions.append("music_1 =?")
+    elif music_1 == '2':
+        conditions.append("music_1 = ?")
     params.append(music_1)
 
-    if music_2 == '多い':
-        conditions.append("music_2 >= ?")
-    elif music_2 == '少ない':
-        conditions.append("music_2 < ?")
-    params.append(music_2)
+    # if music_2 == '3':
+    #     conditions.append("music_2 = ?")
+    # elif music_2 == '4':
+    #     conditions.append("music_2 = ?")
+    # params.append(music_2)
 
     #ここはエラーチェックです
-    #質問が６つあるので長さが6でないとリダイレクトしてもう一度記入して絵もらうことになります
-    if len(conditions)==6 and len(params)==6:
-        return render_template('/result.html',conditions=conditions,params=params)
-    else:
-        #もう一度やり直してくださいという表記が欲しい
-        return redirect('/survey.html')
+    #質問が６つあるので長さが6でないとリダイレクトしてもう一度記入してもらうことになります
+    if len(conditions)!=5:
+        return redirect('survey')
     
-
-@app.route('/result.html',methods=["GET","POST"])
-def get_items():
-    #surveyから送られたリストを受け取る
-    rates=tuple(request.args.get('conditions'))
     #HTMLに送るための結果のリスト
     results=[]
-    if rates:
+    sns=[]
+    if conditions:
         #データベースにアクセスして、取得する
-        query="SELECT * FROM evaluate WHERE " + " AND ".join(rates) 
-        cursor.execute(query, (rates))
-        results = cursor.fetchall()
+        query = "SELECT name FROM evaluate WHERE "
+        for i, condition in enumerate(conditions):
+            if i !=0:
+                query += " AND "
+                query += condition
+            else:
+                query+=condition
+        
+        params = tuple(params)
 
-        return render_template('result.html', results=results)
+        cursor = get_cursor()
+        results=cursor.execute(query,params)
+        results = cursor.fetchall()
+        
+
+        
+        for i in results:
+            querySns = "SELECT name, image, twitter, youtube FROM pre_sns WHERE name=?"
+            cursorSns = get_cursor()
+            cursorSns.execute(querySns,i)
+            
+            for row in cursorSns.fetchall():
+                image_name = row[0]
+                image_url = row[1]  # 画像データへのURL
+                snsTwitter = row[2]  # SNS
+                snsYoutube = row[3]
+
+                sns.append({"name": image_name, "url": image_url, "Twitter": snsTwitter, "Youtube": snsYoutube})
+            
+        if result is not None:
+            return render_template('result.html', results=results,sns=sns)#rate=params,string=query値チェック用
+        else:
+            return redirect('survey')
     else:
-        return redirect('/survey.html')
+        return redirect('survey')
+
+@app.route('/image/<image_up>',methods=["GET","POST"])
+def image(image_up):
+    image_data = get_image_data(image_up)
+    # 画像データをクライアントに送信
+    return send_file(image_data, mimetype='image/jpeg')
+
+
+
 if __name__ == '__main__':
     # db.create_all()
     app.run()
-
