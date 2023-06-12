@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, send_file
 import threading
-from flask_sqlalchemy import SQLAlchemy
+
 import sqlite3
 
 #flaskを使うためのおまじないです
@@ -165,7 +165,7 @@ def result():
             querySns = "SELECT name, image, twitter, youtube FROM pre_sns WHERE name=?"
             cursorSns = get_cursor()
             cursorSns.execute(querySns,i)
-            
+       
             for row in cursorSns.fetchall():
                 image_name = row[0]
                 image_url = row[1]  # 画像データへのURL
