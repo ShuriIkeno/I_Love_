@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>サンプルページ</title>
+  <meta charset="UTF-8">
 </head>
 <body>
   <h1>診断結果</h1>
@@ -11,12 +12,24 @@
       {% for result in results %}
       <li>{{ result }}</li>
       {% endfor %}
+      {{ ty }}
+      {% for ra in rate %}
+      <li>{{ ra }}</li>
+      {% endfor %}
+      <li>{% print(string) %}</li>
     </ul>
   </ul>
-  <a href="survey.html">
+  <h1>画像</h1>
+  {% for info in sns %}
+    <h2>{{ info.name }}</h2>
+    <img src="{{ info.url }}">
+    <p><a href="{{ info.Twitter}}">これは "{{ info.name }}" のTwitterです。</a></p>
+    <p><a href="{{ info.Youtube}}">これは "{{ info.name }}" のYoutubeです。</a></p>
+  {% endfor %}
+  <a href="/survey">
     <button>もう一度診断する</button>
   </a>
-  <a href="webpage.html">
+  <a href="/webpage">
     <button>最初のページへもどる</button>
 </a>
 </body>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>アンケート（仮）</title>
+    <meta charset="UTF-8">
+    <style>
+        .rating-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .rating-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            border: none;
+            margin: 0 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .rating-button:hover {
+            background-color: #ccc;
+            transform: scale(1.1);
+        }
+
+        .rating-button.active {
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+    <script>
+        var selectedRatings = {};
+
+        function selectRating(question, rating) {
+            selectedRatings[question] = rating;
+        }
+
+        function submitSurvey() {
+            var numQuestions = 6;
+            var numSelected = Object.keys(selectedRatings).length;
+            if (numSelected === numQuestions) {
+                var surveyForm = document.createElement('form');
+                surveyForm.method = "POST";
+                surveyForm.action = "/result";
+
+                for (var question in selectedRatings) {
+                    var input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = question;
+                    input.value = selectedRatings[question];
+                    surveyForm.appendChild(input);
+                }
+
+                document.body.appendChild(surveyForm);
+                surveyForm.submit();
+            } else {
+                alert("全ての設問に回答してください。");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>アンケート</h1>
+    <form action="/result" method="POST">
+        <!-- <label for="rate">評価：</label>
+        <input type="text" name="data-rating" id="ratingInput" readonly>
+         -->
+        <h3>メンバー</h3>
+        <div class="rating-container">
+            <button type="button" class="rating-button" name="member" value="多い" onclick="selectRating('member', '多い')">多い</button>
+            <button type="button" class="rating-button" name="member" value="少ない" onclick="selectRating('member', '少ない')">少ない</button>
+        </div>
+
+        <h3>年齢</h3>
+        <div class="rating-container">
+            <button type="button" class="rating-button" name="age" value="多い" onclick="selectRating('age', '多い')">多い</button>
+            <button type="button" class="rating-button" name="age" value="少ない" onclick="selectRating('age', '少ない')">少ない</button>
+        </div>
+
+        <h3>歌</h3>
+        <div class="rating-container">
+            <button type="button" class="rating-button" name="sing" value="多い" onclick="selectRating('sing', '多い')">多い</button>
+            <button type="button" class="rating-button" name="sing" value="少ない" onclick="selectRating('sing', '少ない')">少ない</button>
+        </div>
+
+        <h3>ファン</h3>
+        <div class="rating-container">
+            <button type="button" class="rating-button" name="fan" value="多い" onclick="selectRating('fan', '多い')">多い</button>
+            <button type="button" class="rating-button" name="fan" value="少ない" onclick="selectRating('fan', '少ない')">少ない</button>
+        </div>
+
+        <h3>音楽性１</h3>
+        <div class="rating-container">
+            <button type="button" class="rating-button" name="music_1" value="1" onclick="selectRating('music_1', '1')">1</button>
+            <button type="button" class="rating-button" name="music_1" value="2" onclick="selectRating('music_1', '2')">2</button>
+        </div>
+
+        <h3>音楽性２</h3>
+        <div class="rating-container">
+            <button type="button" class="rating-button" name="music_2" value="3" onclick="selectRating('music_2', '3')">3</button>
+            <button type="button" class="rating-button" name="music_2" value="4" onclick="selectRating('music_2', '4')">4</button>
+        </div>
+
+        <button type="button" onclick="submitSurvey()">診断結果を表示</button>
+    </form>
+</body>
+</html>
