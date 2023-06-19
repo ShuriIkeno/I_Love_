@@ -5,9 +5,6 @@ import sqlite3
 
 #flaskを使うためのおまじないです
 app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI']='sqlite:////Users/ikenoshuri/システム主専攻実習_推し/example.db'
-# db=SQLAlchemy(app)
-
 
 # スレッドローカルストレージを使用してSQLite接続を保存する
 thread_local = threading.local()
@@ -29,7 +26,7 @@ def get_image_data(image_id):
     conn = sqlite3.connect('example.db')
     c = conn.cursor()
     search_image='image/'+image_id
-    c.execute('SELECT image FROM pre_sns WHERE image = ?', (search_image,))
+    c.execute('SELECT image FROM sns WHERE image = ?', (search_image,))
     result = c.fetchall()
     image_data=''
     if result:
@@ -41,34 +38,7 @@ def get_image_data(image_id):
     else:
         conn.close()
         return None
-#ここはデータベースのクラスを設定しています
-#ですが設定により使わないかもしれません
-#使う場合がありますので残しておいてください
-# class Evaluate(db.Model):
-    # ここに評価項目を挿入する
-    # id=db.Column(db.Integer,primary_key=True)
-    # name = db.Column(db.String(80), nullable=False)
-    # member = db.Column(db.Integer, nullable=False)
-    # age = db.Column(db.Integer, nullable=False)
-    # sing = db.Column(db.Integer,nullable=False)
-    # fan = db.Column(db.Integer,nullable=False)
-    # music_1 = db.Column(db.Integer,nullable=False)
-    # music_2 = db.Column(db.Integer,nullable=False)
 
-    # def __repr__(self):
-    #     return '<Evaluate {}>'.format(self.name)
-
-# class Sns(db.Model):
-#     id = db.Column(db.Integer,primary_key=True)
-#     name = db.Column(db.String(80), nullable=False)
-#     twitter = db.Column(db.String(80), nullable=False)
-#     youtube = db.Column(db.String(80), nullable=False)
-
-
-
-    # def __repr__(self):
-    #     return '<Sns {}>'.format(self.name)
-    
 #ここはルートでHTMLを表示するだけです
 @app.route('/')
 def welcome():
@@ -89,7 +59,7 @@ def result():
     sing = request.form.get('sing')
     fan = request.form.get('fan')
     music_1 = request.form.get('music_1')
-    music_2 = request.form.get('music_2')
+    
     conditions = []
     params = []
    
@@ -129,14 +99,8 @@ def result():
         conditions.append("music_1 = ?")
     params.append(music_1)
 
-    # if music_2 == '3':
-    #     conditions.append("music_2 = ?")
-    # elif music_2 == '4':
-    #     conditions.append("music_2 = ?")
-    # params.append(music_2)
-
     #ここはエラーチェックです
-    #質問が６つあるので長さが6でないとリダイレクトしてもう一度記入してもらうことになります
+    #質問が６つあるので長さが5でないとリダイレクトしてもう一度記入してもらうことになります
     if len(conditions)!=5:
         return redirect('survey')
     
@@ -162,7 +126,7 @@ def result():
 
         
         for i in results:
-            querySns = "SELECT name, image, twitter, youtube FROM pre_sns WHERE name=?"
+            querySns = "SELECT name, image, twitter, youtube FROM sns WHERE name=?"
             cursorSns = get_cursor()
             cursorSns.execute(querySns,i)
        
@@ -183,12 +147,16 @@ def result():
 
 @app.route('/image/<image_up>',methods=["GET","POST"])
 def image(image_up):
+    
     image_data = get_image_data(image_up)
     # 画像データをクライアントに送信
     return send_file(image_data, mimetype='image/jpeg')
 
-
+@app.route('/icon/<icon_up>',methods=["GET","POST"])
+def icon(icon_up):
+    image_data = 'icon/'+icon_up
+    # 画像データをクライアントに送信
+    return send_file(image_data, mimetype='image/jpeg')
 
 if __name__ == '__main__':
-    # db.create_all()
     app.run()

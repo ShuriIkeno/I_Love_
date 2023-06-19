@@ -4,6 +4,11 @@
     <title>アンケート（仮）</title>
     <meta charset="UTF-8">
     <style>
+        body {
+        background-image: url("icon/survey_wallpaper.jpg");
+        background-size: contain;
+        text-align:center
+        }
         .rating-container {
             display: flex;
             justify-content: center;
@@ -11,11 +16,23 @@
             margin-top: 50px;
         }
 
-        .rating-button {
-            width: 40px;
-            height: 40px;
+        .result-button {
+            width: 140px;
+            height: 80px;
             border-radius: 50%;
-            background-color: #ddd;
+            background-color: #39caa3;
+            border: none;
+            margin: 0 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .rating-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #ef8ccc;
             border: none;
             margin: 0 5px;
             font-size: 16px;
@@ -24,13 +41,16 @@
         }
 
         .rating-button:hover {
-            background-color: #ccc;
+            background-color: #fd29ba;
             transform: scale(1.1);
         }
 
         .rating-button.active {
-            background-color: #333;
-            color: #fff;
+            background-color: #000000;
+            color: #000000;
+        }
+        span{
+            color: #ef8ccc;
         }
     </style>
     <script>
@@ -41,7 +61,7 @@
         }
 
         function submitSurvey() {
-            var numQuestions = 6;
+            var numQuestions = 5;
             var numSelected = Object.keys(selectedRatings).length;
             if (numSelected === numQuestions) {
                 var surveyForm = document.createElement('form');
@@ -65,48 +85,50 @@
     </script>
 </head>
 <body>
-    <h1>アンケート</h1>
+    <p style="line-height:1rem;text-align:left;height:10rem;"></p>
+    <h1><span>診断スタート</span></h1>
     <form action="/result" method="POST">
         <!-- <label for="rate">評価：</label>
         <input type="text" name="data-rating" id="ratingInput" readonly>
          -->
-        <h3>メンバー</h3>
+        <h3>グループの人数はどっちがいい？
+        </h3>
         <div class="rating-container">
             <button type="button" class="rating-button" name="member" value="多い" onclick="selectRating('member', '多い')">多い</button>
             <button type="button" class="rating-button" name="member" value="少ない" onclick="selectRating('member', '少ない')">少ない</button>
         </div>
+        <p style="line-height:1rem;text-align:left;height:2rem;"></p>
 
-        <h3>年齢</h3>
+        <h3>グループの平均年齢はどっちがいい？</h3>
         <div class="rating-container">
-            <button type="button" class="rating-button" name="age" value="多い" onclick="selectRating('age', '多い')">多い</button>
-            <button type="button" class="rating-button" name="age" value="少ない" onclick="selectRating('age', '少ない')">少ない</button>
+            <button type="button" class="rating-button" name="age" value="多い" onclick="selectRating('age', '多い')">大人</button>
+            <button type="button" class="rating-button" name="age" value="少ない" onclick="selectRating('age', '少ない')">若い</button>
         </div>
+        <p style="line-height:1rem;text-align:left;height:2rem;"></p>
 
-        <h3>歌</h3>
+        <h3>アイドルに歌唱力は求める？</h3>
         <div class="rating-container">
-            <button type="button" class="rating-button" name="sing" value="多い" onclick="selectRating('sing', '多い')">多い</button>
-            <button type="button" class="rating-button" name="sing" value="少ない" onclick="selectRating('sing', '少ない')">少ない</button>
+            <button type="button" class="rating-button" name="sing" value="多い" onclick="selectRating('sing', '多い')">求める</button>
+            <button type="button" class="rating-button" name="sing" value="少ない" onclick="selectRating('sing', '少ない')">そこまで...</button>
         </div>
+        <p style="line-height:1rem;text-align:left;height:2rem;"></p>
 
-        <h3>ファン</h3>
+        <h3>自分とアイドルとの距離感はどっちがいい？
+        </h3>
         <div class="rating-container">
-            <button type="button" class="rating-button" name="fan" value="多い" onclick="selectRating('fan', '多い')">多い</button>
-            <button type="button" class="rating-button" name="fan" value="少ない" onclick="selectRating('fan', '少ない')">少ない</button>
+            <button type="button" class="rating-button" name="fan" value="多い" onclick="selectRating('fan', '多い')">近い！</button>
+            <button type="button" class="rating-button" name="fan" value="少ない" onclick="selectRating('fan', '少ない')">遠くてもいいかな...</button>
         </div>
+        <p style="line-height:1rem;text-align:left;height:2rem;"></p>
 
-        <h3>音楽性１</h3>
+        <h3>曲の系統の好みはどっち？</h3>
         <div class="rating-container">
-            <button type="button" class="rating-button" name="music_1" value="1" onclick="selectRating('music_1', '1')">1</button>
-            <button type="button" class="rating-button" name="music_1" value="2" onclick="selectRating('music_1', '2')">2</button>
+            <button type="button" class="rating-button" name="music_1" value="1" onclick="selectRating('music_1', '1')">かわいい</button>
+            <button type="button" class="rating-button" name="music_1" value="2" onclick="selectRating('music_1', '2')">かっこいい</button>
         </div>
-
-        <h3>音楽性２</h3>
-        <div class="rating-container">
-            <button type="button" class="rating-button" name="music_2" value="3" onclick="selectRating('music_2', '3')">3</button>
-            <button type="button" class="rating-button" name="music_2" value="4" onclick="selectRating('music_2', '4')">4</button>
-        </div>
-
-        <button type="button" onclick="submitSurvey()">診断結果を表示</button>
+        <p style="line-height:1rem;text-align:left;height:3rem;"></p>
+        <button type="button" class="result-button" onclick="submitSurvey()">診断結果を表示</button>
     </form>
 </body>
 </html>
+

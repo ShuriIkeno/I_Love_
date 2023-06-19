@@ -3,28 +3,43 @@
 <head>
   <title>サンプルページ</title>
   <meta charset="UTF-8">
+  <style>
+    body {
+      background-image: url("icon/survey_wallpaper.jpg");
+      background-size: contain;
+      text-align:center
+      }
+    span{
+          color: #dc7e32;
+          font-size: 45px;
+      }
+    span2{
+        color: #704f34;
+        font-size: 18px;
+      }
+    /* img.main {
+        width: 90%;
+        height: 90%;
+      } */
+  </style>
 </head>
 <body>
-  <h1>診断結果</h1>
-  <p>回答にマッチするグループ上位３組を表示</p>
-  <ul>
-    <ul>
-      {% for result in results %}
-      <li>{{ result }}</li>
-      {% endfor %}
-      {{ ty }}
-      {% for ra in rate %}
-      <li>{{ ra }}</li>
-      {% endfor %}
-      <li>{% print(string) %}</li>
-    </ul>
-  </ul>
-  <h1>画像</h1>
+  <h1><span>診断結果<span></h1>
+  <p><span2>あなたにおすすめの女性アイドルはこちら！</span2></p>
+  
+  
   {% for info in sns %}
     <h2>{{ info.name }}</h2>
-    <img src="{{ info.url }}">
-    <p><a href="{{ info.Twitter}}">これは "{{ info.name }}" のTwitterです。</a></p>
-    <p><a href="{{ info.Youtube}}">これは "{{ info.name }}" のYoutubeです。</a></p>
+    <img src="{{ info.url }}" class="main">
+    <p><a href="{{ info.Twitter}}">
+      <img src="icon/twitter_icon.jpg" style="width: 80px; height: 80px;">
+    </a>
+    <a href="{{ info.Youtube}}">
+      <img src="icon/youtube_icon.jpg" style="width: 86px; height: 88px;">
+    </a>
+    <a href="{{ info.Instagram}}">
+      <img src="icon/insta_icon.jpg" style="width: 80px; height: 80px;">
+    </a></p>
   {% endfor %}
   <a href="/survey">
     <button>もう一度診断する</button>
