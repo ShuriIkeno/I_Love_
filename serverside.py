@@ -126,7 +126,7 @@ def result():
 
         
         for i in results:
-            querySns = "SELECT name, image, twitter, youtube FROM sns WHERE name=?"
+            querySns = "SELECT name, image, twitter, youtube, instagram FROM sns WHERE name=?"
             cursorSns = get_cursor()
             cursorSns.execute(querySns,i)
        
@@ -135,8 +135,8 @@ def result():
                 image_url = row[1]  # 画像データへのURL
                 snsTwitter = row[2]  # SNS
                 snsYoutube = row[3]
-
-                sns.append({"name": image_name, "url": image_url, "Twitter": snsTwitter, "Youtube": snsYoutube})
+                snsInstagram=row[4]
+                sns.append({"name": image_name, "url": image_url, "Twitter": snsTwitter, "Youtube": snsYoutube, "Instagram": snsInstagram})
             
         if result is not None:
             return render_template('result.html', results=results,sns=sns)#rate=params,string=query値チェック用
