@@ -1,13 +1,21 @@
 from flask import Flask, request, render_template, redirect, send_file
 import threading
-
+from flask_httpauth import HTTPBasicAuth
 import sqlite3
 
 #flaskを使うためのおまじないです
 app = Flask(__name__)
-
+auth = HTTPBasicAuth()
 # スレッドローカルストレージを使用してSQLite接続を保存する
 thread_local = threading.local()
+
+users = {
+    "kisl2023": "7g2023",
+}
+@auth.get_password
+def get_pw(username):
+    return users.get(username) if username in users else None
+
 
 def get_db():
     # スレッドローカルストレージから接続を取得する
@@ -41,18 +49,22 @@ def get_image_data(image_id):
 
 #ここはルートでHTMLを表示するだけです
 @app.route('/')
+@auth.login_required
 def welcome():
     return render_template('webpage.html')
 
 @app.route('/survey')
+@auth.login_required
 def survey():
     return render_template('survey1.html')
 
 @app.route('/webpage')
+@auth.login_required
 def webpage():
     return render_template('webpage.html')
 
 @app.route('/result',methods=["GET","POST"])
+@auth.login_required
 def result():
     member = request.form.get('member')
     age = request.form.get('age')
@@ -146,6 +158,7 @@ def result():
         return redirect('survey')
 
 @app.route('/image/<image_up>',methods=["GET","POST"])
+@auth.login_required
 def image(image_up):
     
     image_data = get_image_data(image_up)
@@ -153,6 +166,7 @@ def image(image_up):
     return send_file(image_data, mimetype='image/jpeg')
 
 @app.route('/icon/<icon_up>',methods=["GET","POST"])
+@auth.login_required
 def icon(icon_up):
     image_data = 'icon/'+icon_up
     # 画像データをクライアントに送信
